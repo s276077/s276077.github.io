@@ -25,20 +25,22 @@
 
 // 応答の定義（ハッシュ）
 var response = {
-    "あなたは誰ですか":"わたしはアレクサではありません",
-    "何歳ですか":"え、わたし、何歳にみえますか",
-    "元気ですか":"元気ですよー",
-    "好きな食べ物は":"焼肉です",
+    "あなた,誰":"わたしはアレクサではありません",
+    "何歳":"え、わたし、何歳にみえますか",
+    "元気":"元気ですよー",
+    "好きな食べ物は何ですか":"焼肉です",
     "こんにちは":"こんにちは",
     "おやすみなさい":"ゆっくり寝てね",
-    "好きなアーティストは":"Hey!Say!JUMPです",
-    "最近よく聞く曲は":"SHANKのGood Night Darlingです",
-    "明日の天気は":"晴れです",
-    "明日の予定は":"ライブに行きます",
-    "天気がいいですね":"気持ち良いですね",
-    "暑いですね":"水分補給を忘れずに",
-    "好きな場所は":"ディズニーリゾートです",
-    "また明日":"またね"
+    "好きな,スポーツ":"テニスです",
+    "好きな,キャラクター":"スティッチです",
+    "名前":"内緒です",
+    "明日,天気":"晴れです",
+    "明日,予定":"ライブに行きます",
+    "今,気温":"30度です",
+    "大阪,天気":"大阪は晴れです",
+    "明日,大阪,天気":"明日の大阪の天気は曇りです",
+    "また明日":"またね",
+    "和歌山,天気": ["和歌山県の天気予報を表示します", "https://weather.yahoo.co.jp/weather/jp/30/"],
 };
 
 const startButton = document.querySelector('#startButton'); // 開始ボタン
@@ -76,13 +78,42 @@ asr.onresult = function(event){
     let output_not_final = '';
     if (event.results[event.resultIndex].isFinal) { // 結果が確定（Final）のとき
       asr.abort(); // 音声認識を停止
-      output += newText + " => " + response[newText] + '<br>';
 
-      tts.text = response[transcript];
-      // 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
-      tts.onend = function(event){
-          asr.start(); // 音声認識を再開
+      let answer, webpage;
+        
+      let keys = Object.keys(response);
+        keys.forEach(function(key) {
+            let flag = true;
+            console.log(transcript);
+            key.split(',').forEach(function(word) {              
+                let pattern = new RegExp(word);
+                let flag_test = pattern.test(transcript); // マッチしたらtrue, しなかったらfalse
+                flag = flag && flag_test; // 両方trueならtrue
+                console.log(pattern + '+' + ':' + flag_test);
+                //flag = flag && new RegExp(word).test(transcript);
+            });
+
+            if(flag){
+		        answer = response[key];
+                console.log(key + " : " + answer);
+            }
+        });
+
+        if(typeof answer == 'undefined'){
+          answer = "ごめんなさい。わかりません。";
       }
+
+        output += transcript + ' => ' + answer + '<br>';
+
+        tts.text = answer;
+	    // 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
+	    tts.onend = function(event){
+            if(typeof webpage != 'undefined'){
+                location.href = webpage; // ページを移動
+            }   
+            asr.start(); // 音声認識を再開 
+	    }
+
 
       speechSynthesis.speak(tts); // 再生
     } else { // 結果がまだ未確定のとき
@@ -98,6 +129,7 @@ startButton.addEventListener('click', function() {
 
 // 停止ボタンのイベントハンドラ
 stopButton.addEventListener('click', function() {
+    asr.abort();
     asr.stop();
 })
 
