@@ -1,0 +1,80 @@
+body {
+    background-color: #f3f3f3;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* 要素を縦並びに設定 */
+    align-items: center; /* 中央揃え */
+    text-align: center;
+}
+
+h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: #89c3db;
+}
+
+/* ボタンを包含する親要素のスタイル */
+p {
+    display: flex; /* 子要素を横並びに配置 */
+    justify-content: center; /* 中央揃え */
+    width: 100%; /* 親要素の幅を100%に設定 */
+}
+
+/*ボタンスタイル*/
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;           /* フレックスボックスを使用 */
+    justify-content: center; /* 水平方向の中央揃え */
+    align-items: center;     /* 垂直方向の中央揃え */
+    width: auto; /* ボタンの幅を内容に合わせる */
+    width: 120px;            /* ボタンの幅を適宜調整 */
+    background-color: #89c3db; /* ボタンの背景色 */
+    color: white;            /* ボタンのテキスト色 */
+    border: none;            /* 枠線を非表示に */
+    border-radius: 5px;      /* ボタンの角を丸く */
+}
+
+button i {
+    margin-right: 7px;       /* アイコンとテキストの間隔 */
+}
+
+/*レスポンス出力エリア*/
+#resultOutput {
+    /*margin-top: 20px;*/
+    padding: 10px;
+    border: 1px solid #ccc;
+    width: 80%; /* 画面幅の80%を使用 */
+    height: 60vh; /* 固定高さ */
+    overflow-y: auto; /* 内容が多い場合はスクロールバーを表示 */
+    background: #fff;
+}  
+
+.transcript-not-final {
+    text-align: right; /* テキストを右寄せ */
+    width: 100%; /* 要素の幅を100%に設定 */
+    display: block; /* ブロックレベル要素として扱う */
+    color: #ddd; /* 文字色を灰色に設定 */
+}
+
+.transcript {
+    text-align: right; /* テキストを右寄せ */
+    width: 100%; /* 幅を100%に設定 */
+    color: #89c3db; /* 色設定 */
+}
+
+.answer {
+    text-align: left; /* テキストを左寄せ */
+    width: 100%; /* 幅を100%に設定 */
+    color: hotpink; /* 色設定 */
+}
+
+/* クレジット部分 */
+p {
+    margin-top: 20px;
+    font-size: 12px;
+}
