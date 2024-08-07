@@ -49,7 +49,7 @@ button i {
     padding: 10px;
     border: 1px solid #ccc;
     width: 80%; /* 画面幅の80%を使用 */
-    height: 60vh; /* 固定高さ */
+    height: 50vh; /* 固定高さ */
     overflow-y: auto; /* 内容が多い場合はスクロールバーを表示 */
     background: #fff;
 }  
