@@ -5,14 +5,16 @@
 <meta http-equiv="Content-Style-Type" content="text/css">
 <meta http-equiv="Content-Script-Type" content="text/javascript">
 <title>Spoken Dialog by Javascript</title>
+<link rel="stylesheet" type="text/css" href="MDseminar.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
 <h1>課題：音声対話</h1>
 
 <p>
-<button id="startButton">start</button>
-<button id="stopButton">stop</button>
+<button id="startButton"><i class="fas fa-microphone"></i> start</button>
+<button id="stopButton"><i class="fas fa-stop"></i>stop</button>
 </p>
 
 <p>
@@ -25,23 +27,25 @@
 
 // 応答の定義（ハッシュ）
 var response = {
-    "あなた,誰":"わたしはアレクサではありません",
-    "何歳":"え、わたし、何歳にみえますか",
-    "元気":"元気ですよー",
-    "好きな,食べ物":"焼肉です",
-    "こんにちは":"こんにちは",
-    "おやすみなさい":"ゆっくり寝てね",
-    "好きな,スポーツ":"テニスです",
-    "好きな,キャラクター":"スティッチです",
-    "名前":"内緒です",
-    "明日,天気":"晴れです",
-    "明日,予定":"ライブに行きます",
-    "今,気温":"30度です",
-    "大阪,天気":"大阪は晴れです",
-    "明日,大阪,天気":"明日の大阪の天気は曇りです",
-    "また明日":"またね",
+    "あなた,誰":["わたしはミュゼット。あなたのお手伝いをします。"],
+    "何歳":["え、わたし、何歳にみえますか"],
+    "元気":["元気ですよー"],
+    "好きな,食べ物":["焼肉です"],
+    "おやすみなさい":["ゆっくり寝てね"],
+    "好きな,スポーツ":["テニスです"],
+    "好きな,キャラクター":["スティッチです"],
+    "明日,天気":["晴れです"],
+    "明日,予定":["ライブに行きます"],
+    "今,気温":["30度です"],
+    "大阪,天気":["大阪は晴れです"],
+    "明日,大阪,天気":["明日の大阪の天気は曇りです"],
+    "また明日":["またね"],
     "和歌山,天気": ["和歌山県の天気予報を表示します", "https://weather.yahoo.co.jp/weather/jp/30/"],
 };
+
+const URL = "https://jlp.yahooapis.jp/NLUService/V2/analyze?appid="; // APIのリクエストURL
+const APPID = "dj00aiZpPXNEaHJWM21lUmpGbCZzPWNvbnN1bWVyc2VjcmV0Jng9NDA-"; // あなたのアプリケーションID
+const queryURL = URL + APPID;
 
 const startButton = document.querySelector('#startButton'); // 開始ボタン
 const stopButton = document.querySelector('#stopButton'); // 停止ボタン
@@ -54,7 +58,7 @@ const tts = new SpeechSynthesisUtterance(); // TTSインスタンスを生成
 //tts.text = textForm.value; // テキストを設定
 tts.lang = "ja-JP"; // 言語(日本語)、英語の場合はen-US
 tts.rate = 1.0; // 速度
-tts.pitch = 1.0; // 声の高さ
+tts.pitch = 0.5; // 声の高さ
 tts.volume = 1.0; // 音量
 
 SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
@@ -73,13 +77,13 @@ let output = ''; // 出力
 // 認識結果が出力されたときのイベントハンドラ
 asr.onresult = function(event){
     let transcript = event.results[event.resultIndex][0].transcript; // 結果文字列
-    let newText = transcript.replace(/\r?\n/g,'').replace(/\0/g,''); // 余計な文字の削除
 
     let output_not_final = '';
     if (event.results[event.resultIndex].isFinal) { // 結果が確定（Final）のとき
       asr.abort(); // 音声認識を停止
 
-      let answer, webpage;
+      let answer;
+      let webpage;
         
       let keys = Object.keys(response);
         keys.forEach(function(key) {
@@ -94,33 +98,85 @@ asr.onresult = function(event){
             });
 
             if(flag){
-		        answer = response[key];
+		        let ret = response[key];
                 console.log(key + " : " + answer);
+                answer = ret[0];
+                webpage = ret[1];
             }
         });
 
-        if(typeof answer == 'undefined'){
-          answer = "ごめんなさい。わかりません。";
-      }
+        if(answer){
+            output += '<div class="transcript">' + transcript + '</div>'
+            output += '<div class="answer">' + answer + '</div><br>';
 
-        output += transcript + ' => ' + answer + '<br>';
-
-        tts.text = answer;
-	    // 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
-	    tts.onend = function(event){
-            if(typeof webpage != 'undefined'){
-                location.href = webpage; // ページを移動
-            }   
-            asr.start(); // 音声認識を再開 
-	    }
-
-
-      speechSynthesis.speak(tts); // 再生
-    } else { // 結果がまだ未確定のとき
-        output_not_final = '<span style="color:#ddd;">' + transcript + '</span>';
+            tts.text = answer;
+            resultOutput.innerHTML = output;
+            speechSynthesis.speak(tts); // ここで再生
+            // 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
+            tts.onend = function(event){
+                if(typeof webpage != 'undefined'){
+                    location.href = webpage; // ページを移動
+                }
+                asr.start(); // 音声認識を再開 
+            }
+        }else{
+            // Yahoo APIを呼び出す
+            callYahooAPI(transcript);
+        }
+    }else { // 結果がまだ未確定のとき
+        output_not_final = '<span class="transcript-not-final">' + transcript + '</span>';
     }
     resultOutput.innerHTML = output + output_not_final; //結果の出力
 }
+
+function callYahooAPI(transcript) {
+    // HTTPリクエストの準備
+    var postdata = {
+        "id": "1234-1", // JSON-RPC2.0 id、値は任意で、指定した値がレスポンスのidになる。
+        "jsonrpc" : "2.0", // APIで固定
+        "method" : "jlp.nluservice.analyze", // APIで固定
+        "params" : { "q" : transcript }, // 解析対象のテキスト 
+    };
+    var jsondata = JSON.stringify(postdata);
+        
+    const request = new XMLHttpRequest();
+    request.open('POST', queryURL, true);
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.responseType = 'json'; // レスポンスはJSON形式に変換
+            
+    // HTTPの状態が変化したときのイベントハンドラ
+    request.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+                        
+            let res = this.response; // 結果はJSON形式
+
+                /*Object.keys(res.result).forEach(function (key) {
+                    console.log(key + ": " + res.result[key])
+                });*/
+                
+            // METHOD が SAY のときのみ
+            if(res.result.METHOD == "SAY"){
+                var answer = res.result.PARAM_TEXT_TTS || res.result.PARAM_TEXT;
+                tts.text = answer;
+                    
+                output += '<div class="transcript">' + transcript + '</div>'
+                output += '<div class="answer">' + answer + '</div><br>';
+                resultOutput.innerHTML = output;
+                speechSynthesis.speak(tts); // 再生
+
+                // 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
+                tts.onend = function(event){
+                    asr.start(); // 音声認識を再開
+                }
+            }else{
+                asr.start();  // 音声認識を再開
+            }
+        }
+    };
+    // HTTPリクエストの実行
+    request.send(jsondata);
+}
+    	
 
 // 開始ボタンのイベントハンドラ
 startButton.addEventListener('click', function() {
@@ -135,5 +191,9 @@ stopButton.addEventListener('click', function() {
 
 </script>
 
+<!-- Yahoo!JAPANのAPIを利用したときはクレジット表記が必要 -->
+<p>
+Web Services by Yahoo! JAPAN （https://developer.yahoo.co.jp/sitemap/）
+</p>
 </body>
 </html>
