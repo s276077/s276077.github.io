@@ -12,10 +12,12 @@
 
 <h1>課題：音声対話</h1>
 
-<p>
-<button id="startButton"><i class="fas fa-microphone"></i> start</button>
-<button id="stopButton"><i class="fas fa-stop"></i>stop</button>
-</p>
+<div class="button-group">
+    <p>
+    <button id="startButton"><i class="fas fa-microphone"></i> start</button>
+    <button id="stopButton"><i class="fas fa-stop"></i>stop</button>
+    </p>
+</div>
 
 <p>
 <div id="resultOutput"></div>
@@ -191,9 +193,11 @@ stopButton.addEventListener('click', function() {
 
 </script>
 
-<!-- Yahoo!JAPANのAPIを利用したときはクレジット表記が必要 -->
-<p>
-Web Services by Yahoo! JAPAN （https://developer.yahoo.co.jp/sitemap/）
-</p>
+<div class="credit">
+    <!-- Yahoo!JAPANのAPIを利用したときはクレジット表記が必要 -->
+    <p>
+    Web Services by Yahoo! JAPAN （https://developer.yahoo.co.jp/sitemap/）
+    </p>
+</div>
 </body>
 </html>
