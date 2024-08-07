@@ -51,7 +51,7 @@ button i {
     /*margin-top: 20px;*/
     padding: 10px;
     border: 1px solid #ccc;
-    width: 80%; /* 画面幅の80%を使用 */
+    width: 75%; /* 画面幅の80%を使用 */
     height: 50vh; /* 固定高さ */
     overflow-y: auto; /* 内容が多い場合はスクロールバーを表示 */
     background: #fff;
