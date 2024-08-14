@@ -13,9 +13,20 @@
 <h1>課題：音声対話</h1>
 
 <div class="button-group">
-    <p>
     <button id="startButton"><i class="fas fa-microphone"></i> start</button>
     <button id="stopButton"><i class="fas fa-stop"></i>stop</button>
+</div>
+
+<div class="h2">
+    <p>私とおしゃべりをしましょう！</p>
+    <p>東京ディズニーリゾートの情報をお知らせします。</p>
+    <p>質問してみてください。</p>
+</div>
+
+<div class="credit">
+    <!-- Yahoo!JAPANのAPIを利用したときはクレジット表記が必要 -->
+    <p>
+    Web Services by Yahoo! JAPAN （https://developer.yahoo.co.jp/sitemap/）
     </p>
 </div>
 
@@ -28,21 +39,25 @@
   // この中身を書いてください。
 
 // 応答の定義（ハッシュ）
+var restaurant = {
+    "ディズニーシーのザンビーニ・ブラザーズ・リストランテのパスタは私の大好物です": "https://www.tokyodisneyresort.jp/tds/restaurant/food/403/",
+    "ディズニーランドのグランマサラのキッチンではサラおばあちゃん自慢の家庭料理が食べられます": "https://www.tokyodisneyresort.jp/tdl/restaurant/food/344/",
+    "ディズニーシーのマンマ・ビスコッティーズ・ベーカリーではマイクのデザインのメロンパンが食べられますよ": "https://www.tokyodisneyresort.jp/tds/restaurant/food/401/",
+    "ディズニーランドのクリスタルパレス・レストランではビュッフェが楽しめます": "https://www.tokyodisneyresort.jp/tdl/restaurant/food/323/",
+};
+const randomRestrant = getRestaurant(restaurant);
+
 var response = {
-    "あなた,誰":["わたしはミュゼット。あなたのお手伝いをします。"],
-    "何歳":["え、わたし、何歳にみえますか"],
-    "元気":["元気ですよー"],
-    "好きな,食べ物":["焼肉です"],
-    "おやすみなさい":["ゆっくり寝てね"],
-    "好きな,スポーツ":["テニスです"],
+    "あなた,誰":["わたしはミュゼット、あなたのお手伝いをします"],
+    "今日,営業時間":["今日の東京ディズニーリゾートの営業時間を表示しますね", "https://www.tokyodisneyresort.jp/tdl/daily/calendar/"],
+    "おすすめ,レストラン":["ディズニーシーのザンビーニ・ブラザーズ・リストランテにはテラス席もありおすすめですよ", "https://www.tokyodisneyresort.jp/tds/restaurant/food/403/"],
+    "好きな,アトラクション":["カリブの海賊です"],
+    "好きな,パークフード":["グレートアメリカン・ワッフルカンパニーのワッフルです"],
     "好きな,キャラクター":["スティッチです"],
-    "明日,天気":["晴れです"],
-    "明日,予定":["ライブに行きます"],
-    "今,気温":["30度です"],
-    "大阪,天気":["大阪は晴れです"],
-    "明日,大阪,天気":["明日の大阪の天気は曇りです"],
     "また明日":["またね"],
-    "和歌山,天気": ["和歌山県の天気予報を表示します", "https://weather.yahoo.co.jp/weather/jp/30/"],
+    "おやすみなさい":["ゆっくり寝てね"],
+    "ディズニー,天気": ["ディズニーリゾートの天気予報を表示します", "https://weathernews.jp/onebox/tenki/spot/01000055/"],
+    "今,何時":["今は、" + new Date().getHours() + "時" + new Date().getMinutes() + "分です"],
 };
 
 const URL = "https://jlp.yahooapis.jp/NLUService/V2/analyze?appid="; // APIのリクエストURL
@@ -108,6 +123,11 @@ asr.onresult = function(event){
         });
 
         if(answer){
+            if (answer == "おすすめのレストランはどこですか") {
+                let randomRestaurant = getRestaurant(restaurant);
+                answer = restaurantName;
+                webpage = restaurantUrl;
+            }
             output += '<div class="transcript">' + transcript + '</div>'
             output += '<div class="answer">' + answer + '</div><br>';
 
@@ -166,10 +186,13 @@ function callYahooAPI(transcript) {
                 resultOutput.innerHTML = output;
                 speechSynthesis.speak(tts); // 再生
 
-                // 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
-                tts.onend = function(event){
-                    asr.start(); // 音声認識を再開
-                }
+                tts.onend = function(event) {
+                    // 音声合成が終了した後に音声認識を再開
+                    if (asr && asr.state !== 'inactive') {
+                        asr.abort();  // 既に認識が開始されている場合は中止
+                    }
+                    asr.start();  // 音声認識を再開
+                };
             }else{
                 asr.start();  // 音声認識を再開
             }
@@ -179,6 +202,12 @@ function callYahooAPI(transcript) {
     request.send(jsondata);
 }
     	
+function getRestaurant(reataurantObject){
+    const restaurantKeys = Object.keys(restaurant);
+    const randomIndex = Math.floor(Math.random() * restaurantKeys.length);
+    const restaurantName = restaurantKeys[randomIndex];
+    const restaurantUrl = restaurant[restaurantName];
+}
 
 // 開始ボタンのイベントハンドラ
 startButton.addEventListener('click', function() {
@@ -193,11 +222,5 @@ stopButton.addEventListener('click', function() {
 
 </script>
 
-<div class="credit">
-    <!-- Yahoo!JAPANのAPIを利用したときはクレジット表記が必要 -->
-    <p>
-    Web Services by Yahoo! JAPAN （https://developer.yahoo.co.jp/sitemap/）
-    </p>
-</div>
 </body>
 </html>
