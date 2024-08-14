@@ -13,32 +13,44 @@ body {
 
 h1 {
     font-size: 40px;
-    margin-bottom: 20px;
-    color: #89c3db;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: #244897;
+}
+
+.h2 {
+    font-size: 12px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    color: #244897;
+}
+
+.h2 p {
+    line-height: 1;
 }
 
 /* ボタンを包含する親要素のスタイル */
 .botton-group {
+    margin-top: -20px;
     display: flex; /* 子要素を横並びに配置 */
     justify-content: center; /* 中央揃え */
     width: 100%; /* 親要素の幅を100%に設定 */
-    margin-top: -20px;
 }
 
 /*ボタンスタイル*/
 button {
     margin: 5px;
     padding: 10px 20px;
-    font-size: 16px;
+    font-size: 20px;
     cursor: pointer;
-    display: inline-flex;           /* フレックスボックスを使用 */
+    display: inline-flex;    /* フレックスボックスを使用 */
     justify-content: center; /* 水平方向の中央揃え */
     align-items: center;     /* 垂直方向の中央揃え */
-    width: auto; /* ボタンの幅を内容に合わせる */
     width: 120px; /* ボタンの幅を固定 */
-    background-color: #89c3db; /* ボタンの背景色 */
-    color: white;            /* ボタンのテキスト色 */
-    border: none;            /* 枠線を非表示に */
+    height: 40px; /* ボタンの高さを固定 */
+    background-color: white; /* ボタンの背景色 */
+    color: #244897;          /* ボタンのテキスト色 */
+    border: 2px solid #244897; /* 枠線の色 */
     border-radius: 5px;      /* ボタンの角を丸く */
 }
 
@@ -46,17 +58,23 @@ button i {
     margin-right: 7px;       /* アイコンとテキストの間隔 */
 }
 
-/*レスポンス出力エリア*/
+/* クレジット部分 */
+.credit {
+    margin-top: 0px;
+    font-size: 10px;
+}
+
+/* レスポンス出力エリアのスタイリング */
 #resultOutput {
-    /*margin-top: 20px;*/
     padding: 10px;
     border: 1px solid #ccc;
-    width: 75%; /* 画面幅の80%を使用 */
-    height: 50vh; /* 固定高さ */
+    width: 75%; /* 画面幅の75%を使用 */
+    height: 55vh; /* 固定高さ */
     overflow-y: auto; /* 内容が多い場合はスクロールバーを表示 */
     background: #fff;
-}  
+}
 
+/* 未確定テキストのスタイリング */
 .transcript-not-final {
     text-align: right; /* テキストを右寄せ */
     width: 100%; /* 要素の幅を100%に設定 */
@@ -64,20 +82,28 @@ button i {
     color: #ddd; /* 文字色を灰色に設定 */
 }
 
+/* 確定テキストのスタイリング */
 .transcript {
     text-align: right; /* テキストを右寄せ */
-    width: 100%; /* 幅を100%に設定 */
-    color: #89c3db; /* 色設定 */
+    width: max-content; /* 内容に応じて幅を自動調整 */
+    background-color: #caf0f8; /* ライトブルーの背景色 */
+    border-radius: 15px; /* 角の丸み */
+    color: #03045e; /* 対照的なダークテキストカラー */
+    padding: 5px 10px; /* 内容の周りにパディングを追加 */
+    margin: 5px 0 5px auto; /* 上下のマージンと右寄せ */
+    display: block; /* ブロックレベル要素として扱う */
+    clear: both; /* フロートをクリア */
 }
 
+/* 回答テキストのスタイリング */
 .answer {
     text-align: left; /* テキストを左寄せ */
-    width: 100%; /* 幅を100%に設定 */
-    color: hotpink; /* 色設定 */
-}
-
-/* クレジット部分 */
-.credit {
-    margin-top: 5px;
-    font-size: 12px;
+    width: max-content; /* 内容に応じて幅を自動調整 */
+    background-color: #eeeded; /* 白の背景色 */
+    border-radius: 15px; /* 角の丸み */
+    color: #6d6875; /* 対照的なダークテキストカラー */
+    padding: 5px 10px; /* 内容の周りにパディングを追加 */
+    margin: 5px auto 5px 0; /* 上下のマージンと左寄せ */
+    display: block; /* ブロックレベル要素として扱う */
+    clear: both; /* フロートをクリア */
 }
